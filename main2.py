@@ -60,17 +60,21 @@ async def l(ctx, number: int, user: discord.Member=None):
 async def zen(ctx, user: discord.Member=None):
 	"""give someone the zeniath role"""
 	role = "Zeniath"
+	non = "non"
 	u = user.mention
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
 
+	if non in [r.name for r in user.roles]:
+		await user.remove_roles(discord.utils.get(user.guild.roles, name=non))
+
 	def check(message):
 		return message.author.id == ctx.author.id
 
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -95,17 +99,21 @@ async def zen(ctx, user: discord.Member=None):
 async def mod(ctx, user: discord.Member=None):
 	"""give someone the mod role"""
 	role = "Mod"
+	non = "non"
 	u = user.mention
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
 
+	if non in [r.name for r in user.roles]:
+		await user.remove_roles(discord.utils.get(user.guild.roles, name=non))
+
 	def check(message):
 		return message.author.id == ctx.author.id
 
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -130,16 +138,20 @@ async def random(ctx, user: discord.Member=None):
 	"""give someone the random role"""
 	role = "Random"
 	u = user.mention
+	non = "non"
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
+
+	if non in [r.name for r in user.roles]:
+		await user.remove_roles(discord.utils.get(user.guild.roles, name=non))
 
 	def check(message):
 		return message.author.id == ctx.author.id
 
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -164,6 +176,7 @@ async def dj(ctx, user: discord.Member=None):
 	"""give someone the dj role"""
 	role = "DJ"
 	u = user.mention
+	non = "non"
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
@@ -171,9 +184,12 @@ async def dj(ctx, user: discord.Member=None):
 	def check(message):
 		return message.author.id == ctx.author.id
 
+	if non in [r.name for r in user.roles]:
+		await user.remove_roles(discord.utils.get(user.guild.roles, name=non))
+
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
