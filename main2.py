@@ -1,9 +1,27 @@
 from discord.ext import commands
 import discord, random, datetime 
 from datetime import datetime 
+from typing import Union, Optional
+import copy
 
 bot = commands.Bot(command_prefix="z.", status=discord.Status.idle, activity=discord.Game(name="testing..."))
 token = "NTQ5MzI0NTg1MTU0MjQ4NzIw.XRa6Yw.ygALh3zry0DSD7YDOrPvngSOcvM"
+
+class GlobalChannel(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            return await commands.TextChannelConverter().convert(ctx, argument)
+        except commands.BadArgument:
+            # Not found... so fall back to ID + global lookup
+            try:
+                channel_id = int(argument, base=10)
+            except ValueError:
+                raise commands.BadArgument(f'Could not find a channel by ID {argument!r}.')
+            else:
+                channel = ctx.bot.get_channel(channel_id)
+                if channel is None:
+                    raise commands.BadArgument(f'Could not find a channel by ID {argument!r}.')
+                return channel
 
 @bot.event
 async def on_ready():
@@ -42,14 +60,26 @@ async def l(ctx, number: int, user: discord.Member=None):
 async def zen(ctx, user: discord.Member=None):
 	"""give someone the zeniath role"""
 	role = "Zeniath"
+	u = user.mention
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
 
+	def check(message):
+		return message.author.id == ctx.author.id
+
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"because {user.mention} already has the role **{role}**, i will remove the role instead! :)")
-		await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
-		return
+		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		msg = await ctx.bot.wait_for('message', check=check)
+
+		if msg.content == "keep":
+			await ctx.send(f"alright, {u} will keep their {role} role :3")
+			return
+		if msg.content == "remove":
+			await ctx.send(f"damn, F in the chat for {u}, they lost their {role} role :/")
+			await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
+			return
 
 	else:
 		try:
@@ -57,7 +87,7 @@ async def zen(ctx, user: discord.Member=None):
 		except Exception as e:
 			await ctx.send(f'There was an error running this command; {str(e)}') #if error
 		else:
-			await ctx.send(f"you are now __***zenified***__, {user.mention}")
+			await ctx.send(f"you are now __***zenified***__, {u}")
 
 
 @bot.command()
@@ -65,14 +95,26 @@ async def zen(ctx, user: discord.Member=None):
 async def mod(ctx, user: discord.Member=None):
 	"""give someone the mod role"""
 	role = "Mod"
+	u = user.mention
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
 
+	def check(message):
+		return message.author.id == ctx.author.id
+
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"because {user.mention} already has the role **{role}**, i will remove the role instead! :)")
-		await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
-		return
+		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		msg = await ctx.bot.wait_for('message', check=check)
+
+		if msg.content == "keep":
+			await ctx.send(f"alright, {u} will keep their {role} role :3")
+			return
+		if msg.content == "remove":
+			await ctx.send(f"damn, F in the chat for {u}, they lost their {role} role :/")
+			await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
+			return
 
 	else:
 		try:
@@ -80,21 +122,33 @@ async def mod(ctx, user: discord.Member=None):
 		except Exception as e:
 			await ctx.send(f'There was an error running this command; {str(e)}') #if error
 		else:
-			await ctx.send(f"you are now __***moderatorfied***__, {user.mention}")
+			await ctx.send(f"you are now __***moderatorfied***__, {u}")
 
 @bot.command()
 @commands.has_any_role("Zeniath", "Noir", "Turbo", "Adem")
 async def random(ctx, user: discord.Member=None):
 	"""give someone the random role"""
 	role = "Random"
+	u = user.mention
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
 
+	def check(message):
+		return message.author.id == ctx.author.id
+
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"because {user.mention} already has the role **{role}**, i will remove the role instead! :)")
-		await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
-		return
+		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		msg = await ctx.bot.wait_for('message', check=check)
+
+		if msg.content == "keep":
+			await ctx.send(f"alright, {u} will keep their {role} role :3")
+			return
+		if msg.content == "remove":
+			await ctx.send(f"damn, F in the chat for {u}, they lost their {role} role :/")
+			await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
+			return
 
 	else:
 		try:
@@ -102,21 +156,33 @@ async def random(ctx, user: discord.Member=None):
 		except Exception as e:
 			await ctx.send(f'There was an error running this command; {str(e)}') #if error
 		else:
-			await ctx.send(f"you are now __***randomaratorfied***__, {user.mention}")
+			await ctx.send(f"you are now __***randomaratorfied***__, {u}")
 
 @bot.command()
 @commands.has_any_role("Zeniath", "Noir", "Turbo", "Adem")
 async def dj(ctx, user: discord.Member=None):
 	"""give someone the dj role"""
 	role = "DJ"
+	u = user.mention
 
 	if user is None:
 		user = await ctx.send("oi mate, mention a member eh?")
 
+	def check(message):
+		return message.author.id == ctx.author.id
+
 	if role in [r.name for r in user.roles]:
-		await ctx.send(f"because {user.mention} already has the role **{role}**, i will remove the role instead! :)")
-		await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
-		return
+		await ctx.send(f"""because {u} already has the role **{role}**, i will ask you whether you would like to remove it or keep it! :)\n\n"""
+			"""if you would like to keep the role say "keep" and if you would like to remove it say "remove" """)
+		msg = await ctx.bot.wait_for('message', check=check)
+
+		if msg.content == "keep":
+			await ctx.send(f"alright, {u} will keep their {role} role :3")
+			return
+		if msg.content == "remove":
+			await ctx.send(f"damn, F in the chat for {u}, they lost their {role} role :/")
+			await user.remove_roles(discord.utils.get(user.guild.roles, name=role))
+			return
 
 	else:
 		try:
@@ -124,7 +190,18 @@ async def dj(ctx, user: discord.Member=None):
 		except Exception as e:
 			await ctx.send(f'There was an error running this command; {str(e)}') #if error
 		else:
-			await ctx.send(f"you are now __***djafied***__, {user.mention}")
+			await ctx.send(f"you are now __***djafied***__, {u}")
+
+@bot.command(aliases=['copy'])
+async def sudo(ctx, channel: Optional[GlobalChannel], who: discord.User, *, command: str):
+	"""run a command as another user optionally in another channel"""
+	msg = copy.copy(ctx.message)
+	channel = channel or ctx.channel
+	msg.channel = channel
+	msg.author = channel.guild.get_member(who.id) or who
+	msg.content = ctx.prefix + command
+	new_ctx = await ctx.bot.get_context(msg, cls=type(ctx))
+	await ctx.bot.invoke(new_ctx)
 
 
 @bot.command()
