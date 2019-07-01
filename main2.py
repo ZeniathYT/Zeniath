@@ -3,39 +3,19 @@ import discord, random, datetime
 from datetime import datetime 
 from typing import Union, Optional
 import copy
+import asyncio
 
-bot = commands.Bot(command_prefix="z.", status=discord.Status.idle, activity=discord.Game(name="testing..."))
+bot = commands.Bot(command_prefix="z.", status=discord.Status.idle, activity=discord.Game(name="use z.help"))
 token = "NTQ5MzI0NTg1MTU0MjQ4NzIw.XRa6Yw.ygALh3zry0DSD7YDOrPvngSOcvM"
-
-class GlobalChannel(commands.Converter):
-    async def convert(self, ctx, argument):
-        try:
-            return await commands.TextChannelConverter().convert(ctx, argument)
-        except commands.BadArgument:
-            # Not found... so fall back to ID + global lookup
-            try:
-                channel_id = int(argument, base=10)
-            except ValueError:
-                raise commands.BadArgument(f'Could not find a channel by ID {argument!r}.')
-            else:
-                channel = ctx.bot.get_channel(channel_id)
-                if channel is None:
-                    raise commands.BadArgument(f'Could not find a channel by ID {argument!r}.')
-                return channel
 
 @bot.event
 async def on_ready():
 	print("bot is on wowza") 
 
-@bot.command(aliases=['flip'])
-async def coinflip(ctx):
-	await ctx.trigger_typing()
-	number = random.randint(1,2)
-
-	if number == 1:
-		await ctx.send("You flipped the coin. It landed on **tails**")
-	else:
-		await ctx.send("You flipped the coin. It landed on **heads**")
+async def on_message(message):
+	if message.content == "zen" or message.content == "🇿 🇪 🇳" or message.content == f"<@!549324585154248720>" or message.content == f"<@549324585154248720>" or message.content == "Zen" or message.content == "ZEN":
+		await message.channel.send(f"sup bois. my prefix is `z.` and if you wanna see ma commands do `z.help`! epic. awesome....\n\n\n\n\n\n\n\n\n\n\n\n\nbye")
+		return
 
 
 #@bot.command(aliases=['8ball', 'eightball', 'eight_ball'])
@@ -43,17 +23,70 @@ async def coinflip(ctx):
 	#"""ask the 8ball a question!"""
 	#await ctx.trigger_typing()
 
-@bot.command()
-@commands.has_any_role("Zeniath", "Noir")
-async def l(ctx, number: int, user: discord.Member=None):
-	"""spam someone with the letter L"""
-	if user is None:
-		for i in range(number):
-			await ctx.send("L")
+	#responses = 
 
+@bot.command(aliases=['mention', 'flood', 'L', 'l', 'eL'])
+@commands.has_any_role("Zeniath", "Noir")
+async def spam(ctx, user: discord.Member, number: int, *, say=None):
+	"""spam someone with the letter L"""
+	u = user.mention
+
+	if say is None:
+		say = f"L, {u}"
 	else:
-		for i in range(number):
-			await ctx.send(f"L, {user.mention}")
+		say = f"{say}, L, {u}"
+
+	def check(message):
+		return message.author.id == user.id
+
+	await ctx.send(f"{u} will be L'ed for the next {number} times they type in the chat\n\n\n\n\nL")
+
+	for i in range(number):
+		msg = await bot.wait_for('message', check=check)
+		loop = number - 1
+		await ctx.send(f"{say} ({loop} more to go)")
+		try:
+			await user.send(f"{say} ({loop} more to go)")
+		except Exception as e:
+			print(f'There was an error running this command; {str(e)}') #if error
+
+	await asyncio.sleep(1)
+	await ctx.send(f"i apologise... at least that's over now :)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n1 more HEHE\n{say}")
+	try:
+		await user.send(f"i apologise... at least that's over now :)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n1 more HEHE\n{say}")
+	except Exception as e:
+		print(f'There was an error running this command; {str(e)}') #if error
+
+
+#@bot.command()
+#async def slowmode(ctx, channel: )
+
+
+@bot.command(aliases=['cookie'])
+async def cookies(ctx, user: discord.Member, *, whispers=None):
+	"""give a cookie to someone"""
+	try:
+		if whispers is None:
+			await ctx.send(f"*{ctx.author.mention} passes {user.mention} a 🍪*")
+		else:
+			await ctx.send(f"*{ctx.author.mention} passes {user.mention} a 🍪 and whispers {whispers}*")
+	except Exception as e:
+		await ctx.send(f'There was an error running this command; {str(e)}') #if error
+
+
+@bot.command()
+async def poll(ctx, *, question=None):
+	"""ask the community a question"""
+	try:
+		if question is None:
+			await ctx.send("might wanna like... maybe... ask a question? ever thought of that u dumbass?")
+		else:
+			await ctx.message.delete()
+			message = await ctx.send(question)
+			await message.add_reaction("👍")
+			await message.add_reaction("👎")
+	except Exception as e:
+		await ctx.send(f'There was an error running this command; {str(e)}') #if error
 
 @bot.command()
 @commands.has_any_role("Zeniath")
@@ -74,7 +107,7 @@ async def zen(ctx, user: discord.Member=None):
 
 	if role in [r.name for r in user.roles]:
 		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
+			f"""if you would like {u} to keep their role please type "keep" and if you would like to remove it type "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -113,7 +146,7 @@ async def mod(ctx, user: discord.Member=None):
 
 	if role in [r.name for r in user.roles]:
 		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
+			f"""if you would like {u} to keep their role please type "keep" and if you would like to remove it type "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -151,7 +184,7 @@ async def random(ctx, user: discord.Member=None):
 
 	if role in [r.name for r in user.roles]:
 		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
+			f"""if you would like {u} to keep their role please type "keep" and if you would like to remove it type "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -189,7 +222,7 @@ async def dj(ctx, user: discord.Member=None):
 
 	if role in [r.name for r in user.roles]:
 		await ctx.send(f"""because {u} already has the role {role}, i will ask you whether you would like to remove it or keep it! :)\n\n"""
-			f"""if you would {u} like to keep their role say "keep" and if you would like to remove it say "remove" """)
+			f"""if you would like {u} to keep their role please type"keep" and if you would like to remove it type "remove" """)
 		msg = await ctx.bot.wait_for('message', check=check)
 
 		if msg.content == "keep":
@@ -208,23 +241,13 @@ async def dj(ctx, user: discord.Member=None):
 		else:
 			await ctx.send(f"you are now __***djafied***__, {u}")
 
-@bot.command(aliases=['copy'])
-async def sudo(ctx, channel: Optional[GlobalChannel], who: discord.User, *, command: str):
-	"""run a command as another user optionally in another channel"""
-	msg = copy.copy(ctx.message)
-	channel = channel or ctx.channel
-	msg.channel = channel
-	msg.author = channel.guild.get_member(who.id) or who
-	msg.content = ctx.prefix + command
-	new_ctx = await ctx.bot.get_context(msg, cls=type(ctx))
-	await ctx.bot.invoke(new_ctx)
-
 
 @bot.command()
 @commands.has_any_role("Zeniath", "Noir", "Turbo", "Adem")
 async def say(ctx, *, message):
 	"""make the bot say anything you want"""
 	await ctx.send(message)
+	await ctx.message.delete()
 
 
 @bot.command(aliases=['die'])
@@ -233,6 +256,16 @@ async def kill(ctx):
 	"""i think it's kind of obvious... incase you don't know, it kills the bot!"""
 	await ctx.send("what a dick... okay bye")
 	await ctx.bot.logout()
+
+@bot.command(aliases=['pfp'])
+async def avatar(ctx, *, user: discord.User=None):
+	"""displays the users avatar"""
+	if user is None:
+		user = ctx.author
+
+	e = discord.Embed(colour=discord.Colour.gold())
+	e.set_image(url=user.avatar_url)
+	await ctx.send(embed=e)
 
 @bot.command(aliases=['server_members', 'users'])
 async def members(ctx):
