@@ -59,8 +59,20 @@ async def spam(ctx, user: discord.Member, number: int, *, say=None):
 
 
 #@bot.command()
-#async def slowmode(ctx, channel: )
+#async def slowmode(ctx, channel: discord.Channel=None)
 
+@bot.command(aliases=['dos'])
+async def ddos(ctx, user: discord.Member, *, ip=None):
+	"""ddos someone"""
+	if user == ctx.author:
+		await ctx.send("imagine tryna ddos yourself lmfao can't be me...")
+	try:
+		if ip is None:
+			await ctx.send("maybe wanna put an ip in chat idk??? bit of a clappy 👏")
+		else:
+			await ctx.send(f"You have successfully DDOSed {user.mention} with the ip {ip}!")
+	except Exception as e:
+		print(f'There was an error running this command; {str(e)}') #if error
 
 @bot.command(aliases=['cookie'])
 async def cookies(ctx, user: discord.Member, *, whispers=None):
